@@ -1,0 +1,2278 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Bus Ticket Booking API",
+    "version": "1.0.0",
+    "description": "API for managing bus ticket bookings, including admin operations for departure points, destinations, bus types, distances, estimated times, ticket prices, and user operations for searching routes and managing bookings."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Local development server"
+    },
+    {
+      "url": "https://api.busbooking.com",
+      "description": "Production server"
+    }
+  ],
+  "paths": {
+    "/api/departure-points": {
+      "get": {
+        "summary": "Get all departure points with filters and pagination",
+        "tags": ["Departure Points"],
+        "parameters": [
+          {
+            "name": "city",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "Filter by city name"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "default": 1 },
+            "description": "Page number for pagination"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": { "type": "integer", "default": 10 },
+            "description": "Number of items per page"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of departure points",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeparturePointListResponse"
+                },
+                "example": {
+                  "status": "success",
+                  "data": {
+                    "departurePoints": [
+                      {
+                        "id": "dp1",
+                        "city": "Hanoi",
+                        "station": "My Dinh Bus Station",
+                        "created_at": "2025-07-21T07:00:00Z"
+                      }
+                    ],
+                    "totalCount": 1,
+                    "totalPages": 1,
+                    "page": 1,
+                    "limit": 10
+                  }
+                }
+              }
+            }
+          },
+          "500": { "description": "Internal Server Error" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      },
+      "post": {
+        "summary": "Create a new departure point",
+        "tags": ["Departure Points"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/DeparturePointCreate" },
+              "example": { "city": "Hanoi", "station": "My Dinh Bus Station" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Departure point created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeparturePointResponse"
+                },
+                "example": {
+                  "status": "success",
+                  "data": {
+                    "id": "dp1",
+                    "city": "Hanoi",
+                    "station": "My Dinh Bus Station",
+                    "created_at": "2025-07-21T07:00:00Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Invalid input" },
+          "500": { "description": "Internal Server Error" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      }
+    },
+    "/api/departure-points/{id}": {
+      "get": {
+        "summary": "Get a departure point by ID",
+        "tags": ["Departure Points"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Departure point ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Departure point details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeparturePointResponse"
+                },
+                "example": {
+                  "status": "success",
+                  "data": {
+                    "id": "dp1",
+                    "city": "Hanoi",
+                    "station": "My Dinh Bus Station",
+                    "created_at": "2025-07-21T07:00:00Z"
+                  }
+                }
+              }
+            }
+          },
+          "404": { "description": "Departure point not found" },
+          "500": { "description": "Internal Server Error" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      },
+      "put": {
+        "summary": "Update a departure point",
+        "tags": ["Departure Points"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Departure point ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/DeparturePointUpdate" },
+              "example": { "city": "Hanoi", "station": "Nuoc Ngam Bus Station" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Departure point updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeparturePointResponse"
+                },
+                "example": {
+                  "status": "success",
+                  "data": {
+                    "id": "dp1",
+                    "city": "Hanoi",
+                    "station": "Nuoc Ngam Bus Station",
+                    "created_at": "2025-07-21T07:00:00Z"
+                  }
+                }
+              }
+            }
+          },
+          "404": { "description": "Departure point not found" },
+          "500": { "description": "Internal Server Error" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      },
+      "delete": {
+        "summary": "Delete a departure point",
+        "tags": ["Departure Points"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Departure point ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Departure point deleted",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SuccessResponse" },
+                "example": {
+                  "status": "success",
+                  "data": { "message": "Departure point deleted successfully" }
+                }
+              }
+            }
+          },
+          "404": { "description": "Departure point not found" },
+          "500": { "description": "Internal Server Error" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      }
+    },
+    "/api/destinations": {
+      "get": {
+        "summary": "Get all destinations with filters and pagination",
+        "tags": ["Destinations"],
+        "parameters": [
+          {
+            "name": "city",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "Filter by city name"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "default": 1 },
+            "description": "Page number for pagination"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": { "type": "integer", "default": 10 },
+            "description": "Number of items per page"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of destinations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DestinationListResponse"
+                },
+                "example": {
+                  "status": "success",
+                  "data": {
+                    "destinations": [
+                      {
+                        "id": "dst1",
+                        "city": "Ho Chi Minh City",
+                        "station": "Mien Dong Bus Station",
+                        "created_at": "2025-07-21T07:00:00Z"
+                      }
+                    ],
+                    "totalCount": 1,
+                    "totalPages": 1,
+                    "page": 1,
+                    "limit": 10
+                  }
+                }
+              }
+            }
+          },
+          "500": { "description": "Internal Server Error" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      },
+      "post": {
+        "summary": "Create a new destination",
+        "tags": ["Destinations"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/DestinationCreate" },
+              "example": {
+                "city": "Ho Chi Minh City",
+                "station": "Mien Dong Bus Station"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Destination created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DestinationResponse"
+                },
+                "example": {
+                  "status": "success",
+                  "data": {
+                    "id": "dst1",
+                    "city": "Ho Chi Minh City",
+                    "station": "Mien Dong Bus Station",
+                    "created_at": "2025-07-21T07:00:00Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Invalid input" },
+          "500": { "description": "Internal Server Error" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      }
+    },
+    "/api/destinations/{id}": {
+      "get": {
+        "summary": "Get a destination by ID",
+        "tags": ["Destinations"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Destination ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Destination details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DestinationResponse"
+                },
+                "example": {
+                  "status": "success",
+                  "data": {
+                    "id": "dst1",
+                    "city": "Ho Chi Minh City",
+                    "station": "Mien Dong Bus Station",
+                    "created_at": "2025-07-21T07:00:00Z"
+                  }
+                }
+              }
+            }
+          },
+          "404": { "description": "Destination not found" },
+          "500": { "description": "Internal Server Error" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      },
+      "put": {
+        "summary": "Update a destination",
+        "tags": ["Destinations"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Destination ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/DestinationUpdate" },
+              "example": {
+                "city": "Ho Chi Minh City",
+                "station": "Mien Tay Bus Station"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Destination updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DestinationResponse"
+                },
+                "example": {
+                  "status": "success",
+                  "data": {
+                    "id": "dst1",
+                    "city": "Ho Chi Minh City",
+                    "station": "Mien Tay Bus Station",
+                    "created_at": "2025-07-21T07:00:00Z"
+                  }
+                }
+              }
+            }
+          },
+          "404": { "description": "Destination not found" },
+          "500": { "description": "Internal Server Error" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      },
+      "delete": {
+        "summary": "Delete a destination",
+        "tags": ["Destinations"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Destination ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Destination deleted",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SuccessResponse" },
+                "example": {
+                  "status": "success",
+                  "data": { "message": "Destination deleted successfully" }
+                }
+              }
+            }
+          },
+          "404": { "description": "Destination not found" },
+          "500": { "description": "Internal Server Error" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      }
+    },
+    "/api/bus-types": {
+      "get": {
+        "summary": "Get all bus types with pagination",
+        "tags": ["Bus Types"],
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "Filter by bus type (e.g., Sleeper, Seater)"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "default": 1 },
+            "description": "Page number for pagination"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": { "type": "integer", "default": 10 },
+            "description": "Number of items per page"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of bus types",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BusTypeListResponse"
+                },
+                "example": {
+                  "status": "success",
+                  "data": {
+                    "busTypes": [
+                      {
+                        "id": "bt1",
+                        "type": "Sleeper",
+                        "capacity": 40,
+                        "description": "Luxury sleeper bus"
+                      }
+                    ],
+                    "totalCount": 1,
+                    "totalPages": 1,
+                    "page": 1,
+                    "limit": 10
+                  }
+                }
+              }
+            }
+          },
+          "500": { "description": "Internal Server Error" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      },
+      "post": {
+        "summary": "Create a new bus type",
+        "tags": ["Bus Types"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/BusTypeCreate" },
+              "example": {
+                "type": "Sleeper",
+                "capacity": 40,
+                "description": "Luxury sleeper bus"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Bus type created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/BusTypeResponse" },
+                "example": {
+                  "status": "success",
+                  "data": {
+                    "id": "bt1",
+                    "type": "Sleeper",
+                    "capacity": 40,
+                    "description": "Luxury sleeper bus"
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Invalid input" },
+          "500": { "description": "Internal Server Error" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      }
+    },
+    "/api/bus-types/{id}": {
+      "get": {
+        "summary": "Get a bus type by ID",
+        "tags": ["Bus Types"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Bus type ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bus type details",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/BusTypeResponse" },
+                "example": {
+                  "status": "success",
+                  "data": {
+                    "id": "bt1",
+                    "type": "Sleeper",
+                    "capacity": 40,
+                    "description": "Luxury sleeper bus"
+                  }
+                }
+              }
+            }
+          },
+          "404": { "description": "Bus type not found" },
+          "500": { "description": "Internal Server Error" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      },
+      "put": {
+        "summary": "Update a bus type",
+        "tags": ["Bus Types"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Bus type ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/BusTypeUpdate" },
+              "example": {
+                "type": "Seater",
+                "capacity": 45,
+                "description": "Standard seater bus"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Bus type updated",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/BusTypeResponse" },
+                "example": {
+                  "status": "success",
+                  "data": {
+                    "id": "bt1",
+                    "type": "Seater",
+                    "capacity": 45,
+                    "description": "Standard seater bus"
+                  }
+                }
+              }
+            }
+          },
+          "404": { "description": "Bus type not found" },
+          "500": { "description": "Internal Server Error" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      },
+      "delete": {
+        "summary": "Delete a bus type",
+        "tags": ["Bus Types"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Bus type ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bus type deleted",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SuccessResponse" },
+                "example": {
+                  "status": "success",
+                  "data": { "message": "Bus type deleted successfully" }
+                }
+              }
+            }
+          },
+          "404": { "description": "Bus type not found" },
+          "500": { "description": "Internal Server Error" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      }
+    },
+    "/api/distances": {
+      "get": {
+        "summary": "Get all distances with filters and pagination",
+        "tags": ["Distances"],
+        "parameters": [
+          {
+            "name": "departure_id",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "Filter by departure point ID"
+          },
+          {
+            "name": "destination_id",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "Filter by destination ID"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "default": 1 },
+            "description": "Page number for pagination"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": { "type": "integer", "default": 10 },
+            "description": "Number of items per page"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of distances",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DistanceListResponse"
+                },
+                "example": {
+                  "status": "success",
+                  "data": {
+                    "distances": [
+                      {
+                        "id": "dist1",
+                        "departure_id": "dp1",
+                        "destination_id": "dst1",
+                        "distance_km": 1200,
+                        "created_at": "2025-07-21T07:00:00Z"
+                      }
+                    ],
+                    "totalCount": 1,
+                    "totalPages": 1,
+                    "page": 1,
+                    "limit": 10
+                  }
+                }
+              }
+            }
+          },
+          "500": { "description": "Internal Server Error" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      },
+      "post": {
+        "summary": "Create a new distance",
+        "tags": ["Distances"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/DistanceCreate" },
+              "example": {
+                "departure_id": "dp1",
+                "destination_id": "dst1",
+                "distance_km": 1200
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Distance created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/DistanceResponse" },
+                "example": {
+                  "status": "success",
+                  "data": {
+                    "id": "dist1",
+                    "departure_id": "dp1",
+                    "destination_id": "dst1",
+                    "distance_km": 1200,
+                    "created_at": "2025-07-21T07:00:00Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Invalid input" },
+          "500": { "description": "Internal Server Error" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      }
+    },
+    "/api/distances/{id}": {
+      "get": {
+        "summary": "Get a distance by ID",
+        "tags": ["Distances"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Distance ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Distance details",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/DistanceResponse" },
+                "example": {
+                  "status": "success",
+                  "data": {
+                    "id": "dist1",
+                    "departure_id": "dp1",
+                    "destination_id": "dst1",
+                    "distance_km": 1200,
+                    "created_at": "2025-07-21T07:00:00Z"
+                  }
+                }
+              }
+            }
+          },
+          "404": { "description": "Distance not found" },
+          "500": { "description": "Internal Server Error" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      },
+      "put": {
+        "summary": "Update a distance",
+        "tags": ["Distances"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Distance ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/DistanceUpdate" },
+              "example": { "distance_km": 1250 }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Distance updated",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/DistanceResponse" },
+                "example": {
+                  "status": "success",
+                  "data": {
+                    "id": "dist1",
+                    "departure_id": "dp1",
+                    "destination_id": "dst1",
+                    "distance_km": 1250,
+                    "created_at": "2025-07-21T07:00:00Z"
+                  }
+                }
+              }
+            }
+          },
+          "404": { "description": "Distance not found" },
+          "500": { "description": "Internal Server Error" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      },
+      "delete": {
+        "summary": "Delete a distance",
+        "tags": ["Distances"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Distance ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Distance deleted",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SuccessResponse" },
+                "example": {
+                  "status": "success",
+                  "data": { "message": "Distance deleted successfully" }
+                }
+              }
+            }
+          },
+          "404": { "description": "Distance not found" },
+          "500": { "description": "Internal Server Error" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      }
+    },
+    "/api/estimated-times": {
+      "get": {
+        "summary": "Get all estimated times with filters and pagination",
+        "tags": ["Estimated Times"],
+        "parameters": [
+          {
+            "name": "route_id",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "Filter by route ID"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "default": 1 },
+            "description": "Page number for pagination"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": { "type": "integer", "default": 10 },
+            "description": "Number of items per page"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of estimated times",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EstimatedTimeListResponse"
+                },
+                "example": {
+                  "status": "success",
+                  "data": {
+                    "estimatedTimes": [
+                      {
+                        "id": "et1",
+                        "route_id": "rt1",
+                        "duration_hours": 18.5,
+                        "created_at": "2025-07-21T07:00:00Z"
+                      }
+                    ],
+                    "totalCount": 1,
+                    "totalPages": 1,
+                    "page": 1,
+                    "limit": 10
+                  }
+                }
+              }
+            }
+          },
+          "500": { "description": "Internal Server Error" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      },
+      "post": {
+        "summary": "Create a new estimated time",
+        "tags": ["Estimated Times"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/EstimatedTimeCreate" },
+              "example": { "route_id": "rt1", "duration_hours": 18.5 }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Estimated time created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EstimatedTimeResponse"
+                },
+                "example": {
+                  "status": "success",
+                  "data": {
+                    "id": "et1",
+                    "route_id": "rt1",
+                    "duration_hours": 18.5,
+                    "created_at": "2025-07-21T07:00:00Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Invalid input" },
+          "500": { "description": "Internal Server Error" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      }
+    },
+    "/api/estimated-times/{id}": {
+      "get": {
+        "summary": "Get an estimated time by ID",
+        "tags": ["Estimated Times"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Estimated time ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Estimated time details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EstimatedTimeResponse"
+                },
+                "example": {
+                  "status": "success",
+                  "data": {
+                    "id": "et1",
+                    "route_id": "rt1",
+                    "duration_hours": 18.5,
+                    "created_at": "2025-07-21T07:00:00Z"
+                  }
+                }
+              }
+            }
+          },
+          "404": { "description": "Estimated time not found" },
+          "500": { "description": "Internal Server Error" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      },
+      "put": {
+        "summary": "Update an estimated time",
+        "tags": ["Estimated Times"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Estimated time ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/EstimatedTimeUpdate" },
+              "example": { "duration_hours": 19.0 }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Estimated time updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EstimatedTimeResponse"
+                },
+                "example": {
+                  "status": "success",
+                  "data": {
+                    "id": "et1",
+                    "route_id": "rt1",
+                    "duration_hours": 19.0,
+                    "created_at": "2025-07-21T07:00:00Z"
+                  }
+                }
+              }
+            }
+          },
+          "404": { "description": "Estimated time not found" },
+          "500": { "description": "Internal Server Error" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      },
+      "delete": {
+        "summary": "Delete an estimated time",
+        "tags": ["Estimated Times"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Estimated time ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Estimated time deleted",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SuccessResponse" },
+                "example": {
+                  "status": "success",
+                  "data": { "message": "Estimated time deleted successfully" }
+                }
+              }
+            }
+          },
+          "404": { "description": "Estimated time not found" },
+          "500": { "description": "Internal Server Error" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      }
+    },
+    "/api/ticket-prices": {
+      "get": {
+        "summary": "Get all ticket prices with filters and pagination",
+        "tags": ["Ticket Prices"],
+        "parameters": [
+          {
+            "name": "route_id",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "Filter by route ID"
+          },
+          {
+            "name": "bus_type_id",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "Filter by bus type ID"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "default": 1 },
+            "description": "Page number for pagination"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": { "type": "integer", "default": 10 },
+            "description": "Number of items per page"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of ticket prices",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketPriceListResponse"
+                },
+                "example": {
+                  "status": "success",
+                  "data": {
+                    "ticketPrices": [
+                      {
+                        "id": "tp1",
+                        "route_id": "rt1",
+                        "bus_type_id": "bt1",
+                        "price": 500000,
+                        "currency": "VND",
+                        "created_at": "2025-07-21T07:00:00Z"
+                      }
+                    ],
+                    "totalCount": 1,
+                    "totalPages": 1,
+                    "page": 1,
+                    "limit": 10
+                  }
+                }
+              }
+            }
+          },
+          "500": { "description": "Internal Server Error" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      },
+      "post": {
+        "summary": "Create a new ticket price",
+        "tags": ["Ticket Prices"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/TicketPriceCreate" },
+              "example": {
+                "route_id": "rt1",
+                "bus_type_id": "bt1",
+                "price": 500000,
+                "currency": "VND"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Ticket price created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketPriceResponse"
+                },
+                "example": {
+                  "status": "success",
+                  "data": {
+                    "id": "tp1",
+                    "route_id": "rt1",
+                    "bus_type_id": "bt1",
+                    "price": 500000,
+                    "currency": "VND",
+                    "created_at": "2025-07-21T07:00:00Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Invalid input" },
+          "500": { "description": "Internal Server Error" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      }
+    },
+    "/api/ticket-prices/{id}": {
+      "get": {
+        "summary": "Get a ticket price by ID",
+        "tags": ["Ticket Prices"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Ticket price ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ticket price details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketPriceResponse"
+                },
+                "example": {
+                  "status": "success",
+                  "data": {
+                    "id": "tp1",
+                    "route_id": "rt1",
+                    "bus_type_id": "bt1",
+                    "price": 500000,
+                    "currency": "VND",
+                    "created_at": "2025-07-21T07:00:00Z"
+                  }
+                }
+              }
+            }
+          },
+          "404": { "description": "Ticket price not found" },
+          "500": { "description": "Internal Server Error" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      },
+      "put": {
+        "summary": "Update a ticket price",
+        "tags": ["Ticket Prices"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Ticket price ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/TicketPriceUpdate" },
+              "example": { "price": 550000, "currency": "VND" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ticket price updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketPriceResponse"
+                },
+                "example": {
+                  "status": "success",
+                  "data": {
+                    "id": "tp1",
+                    "route_id": "rt1",
+                    "bus_type_id": "bt1",
+                    "price": 550000,
+                    "currency": "VND",
+                    "created_at": "2025-07-21T07:00:00Z"
+                  }
+                }
+              }
+            }
+          },
+          "404": { "description": "Ticket price not found" },
+          "500": { "description": "Internal Server Error" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      },
+      "delete": {
+        "summary": "Delete a ticket price",
+        "tags": ["Ticket Prices"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Ticket price ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ticket price deleted",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SuccessResponse" },
+                "example": {
+                  "status": "success",
+                  "data": { "message": "Ticket price deleted successfully" }
+                }
+              }
+            }
+          },
+          "404": { "description": "Ticket price not found" },
+          "500": { "description": "Internal Server Error" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      }
+    },
+    "/api/routes/search": {
+      "get": {
+        "summary": "Search for bus routes",
+        "tags": ["Routes"],
+        "parameters": [
+          {
+            "name": "departure_id",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Departure point ID"
+          },
+          {
+            "name": "destination_id",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Destination ID"
+          },
+          {
+            "name": "departure_date",
+            "in": "query",
+            "schema": { "type": "string", "format": "date" },
+            "description": "Departure date (YYYY-MM-DD)"
+          },
+          {
+            "name": "bus_type_id",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "Filter by bus type ID"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "default": 1 },
+            "description": "Page number for pagination"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": { "type": "integer", "default": 10 },
+            "description": "Number of items per page"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of available routes",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RouteListResponse" },
+                "example": {
+                  "status": "success",
+                  "data": {
+                    "routes": [
+                      {
+                        "id": "rt1",
+                        "departure_id": "dp1",
+                        "destination_id": "dst1",
+                        "bus_type_id": "bt1",
+                        "departure_time": "2025-07-22T07:00:00Z",
+                        "duration_hours": 18.5,
+                        "price": 500000,
+                        "currency": "VND",
+                        "available_seats": 20
+                      }
+                    ],
+                    "totalCount": 1,
+                    "totalPages": 1,
+                    "page": 1,
+                    "limit": 10
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Missing required parameters" },
+          "500": { "description": "Internal Server Error" }
+        }
+      }
+    },
+    "/api/bookings": {
+      "post": {
+        "summary": "Create a new booking",
+        "tags": ["Bookings"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/BookingCreate" },
+              "example": {
+                "user_id": "usr1",
+                "route_id": "rt1",
+                "seat_number": 12,
+                "booking_date": "2025-07-22",
+                "passenger_name": "John Doe",
+                "passenger_phone": "0123456789"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Booking created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/BookingResponse" },
+                "example": {
+                  "status": "success",
+                  "data": {
+                    "id": "bk1",
+                    "user_id": "usr1",
+                    "route_id": "rt1",
+                    "seat_number": 12,
+                    "booking_date": "2025-07-22",
+                    "passenger_name": "John Doe",
+                    "passenger_phone": "0123456789",
+                    "created_at": "2025-07-21T07:00:00Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Invalid input or seat already booked" },
+          "500": { "description": "Internal Server Error" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      },
+      "get": {
+        "summary": "Get all bookings for a user",
+        "tags": ["Bookings"],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "User ID"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "default": 1 },
+            "description": "Page number for pagination"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": { "type": "integer", "default": 10 },
+            "description": "Number of items per page"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of bookings",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BookingListResponse"
+                },
+                "example": {
+                  "status": "success",
+                  "data": {
+                    "bookings": [
+                      {
+                        "id": "bk1",
+                        "user_id": "usr1",
+                        "route_id": "rt1",
+                        "seat_number": 12,
+                        "booking_date": "2025-07-22",
+                        "passenger_name": "John Doe",
+                        "passenger_phone": "0123456789",
+                        "created_at": "2025-07-21T07:00:00Z"
+                      }
+                    ],
+                    "totalCount": 1,
+                    "totalPages": 1,
+                    "page": 1,
+                    "limit": 10
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Missing user_id parameter" },
+          "500": { "description": "Internal Server Error" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      }
+    },
+    "/api/bookings/{id}": {
+      "delete": {
+        "summary": "Cancel a booking",
+        "tags": ["Bookings"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Booking ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Booking cancelled",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SuccessResponse" },
+                "example": {
+                  "status": "success",
+                  "data": { "message": "Booking cancelled successfully" }
+                }
+              }
+            }
+          },
+          "404": { "description": "Booking not found" },
+          "500": { "description": "Internal Server Error" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      }
+    },
+    "/api/auth/register": {
+      "post": {
+        "summary": "Register a new user",
+        "tags": ["Auth"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UserRegister" },
+              "example": {
+                "username": "johndoe",
+                "email": "john@example.com",
+                "password": "securepassword123",
+                "full_name": "John Doe",
+                "phone_number": "0123456789"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User registered successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UserResponse" },
+                "example": {
+                  "status": "success",
+                  "data": {
+                    "message": "User registered successfully",
+                    "user": {
+                      "id": "usr1",
+                      "username": "johndoe",
+                      "email": "john@example.com",
+                      "full_name": "John Doe",
+                      "phone_number": "0123456789"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Email already exists or validation error" },
+          "500": { "description": "Internal Server Error" }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "summary": "Login user and get access token",
+        "tags": ["Auth"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UserLogin" },
+              "example": {
+                "email": "john@example.com",
+                "password": "securepassword123"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/LoginResponse" },
+                "example": {
+                  "status": "success",
+                  "data": {
+                    "message": "Login successful",
+                    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                    "user": {
+                      "id": "usr1",
+                      "username": "johndoe",
+                      "email": "john@example.com",
+                      "full_name": "John Doe",
+                      "phone_number": "0123456789"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Invalid email or password" },
+          "500": { "description": "Internal Server Error" }
+        }
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "summary": "Logout user and clear refresh token",
+        "tags": ["Auth"],
+        "responses": {
+          "200": {
+            "description": "Logged out successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SuccessResponse" },
+                "example": {
+                  "status": "success",
+                  "data": { "message": "Logged out successfully" }
+                }
+              }
+            }
+          },
+          "500": { "description": "Internal Server Error" }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "DeparturePoint": {
+        "type": "object",
+        "required": ["city", "station"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the departure point"
+          },
+          "city": {
+            "type": "string",
+            "description": "City of the departure point"
+          },
+          "station": {
+            "type": "string",
+            "description": "Name of the bus station"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+          }
+        }
+      },
+      "DeparturePointCreate": {
+        "type": "object",
+        "required": ["city", "station"],
+        "properties": {
+          "city": { "type": "string" },
+          "station": { "type": "string" }
+        }
+      },
+      "DeparturePointUpdate": {
+        "type": "object",
+        "properties": {
+          "city": { "type": "string" },
+          "station": { "type": "string" }
+        }
+      },
+      "DeparturePointResponse": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "string", "example": "success" },
+          "data": { "$ref": "#/components/schemas/DeparturePoint" }
+        }
+      },
+      "DeparturePointListResponse": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "string", "example": "success" },
+          "data": {
+            "type": "object",
+            "properties": {
+              "departurePoints": {
+                "type": "array",
+                "items": { "$ref": "#/components/schemas/DeparturePoint" }
+              },
+              "totalCount": { "type": "integer" },
+              "totalPages": { "type": "integer" },
+              "page": { "type": "integer" },
+              "limit": { "type": "integer" }
+            }
+          }
+        }
+      },
+      "Destination": {
+        "type": "object",
+        "required": ["city", "station"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the destination"
+          },
+          "city": {
+            "type": "string",
+            "description": "City of the destination"
+          },
+          "station": {
+            "type": "string",
+            "description": "Name of the bus station"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+          }
+        }
+      },
+      "DestinationCreate": {
+        "type": "object",
+        "required": ["city", "station"],
+        "properties": {
+          "city": { "type": "string" },
+          "station": { "type": "string" }
+        }
+      },
+      "DestinationUpdate": {
+        "type": "object",
+        "properties": {
+          "city": { "type": "string" },
+          "station": { "type": "string" }
+        }
+      },
+      "DestinationResponse": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "string", "example": "success" },
+          "data": { "$ref": "#/components/schemas/Destination" }
+        }
+      },
+      "DestinationListResponse": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "string", "example": "success" },
+          "data": {
+            "type": "object",
+            "properties": {
+              "destinations": {
+                "type": "array",
+                "items": { "$ref": "#/components/schemas/Destination" }
+              },
+              "totalCount": { "type": "integer" },
+              "totalPages": { "type": "integer" },
+              "page": { "type": "integer" },
+              "limit": { "type": "integer" }
+            }
+          }
+        }
+      },
+      "BusType": {
+        "type": "object",
+        "required": ["type", "capacity"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the bus type"
+          },
+          "type": {
+            "type": "string",
+            "description": "Type of bus (e.g., Sleeper, Seater)"
+          },
+          "capacity": { "type": "integer", "description": "Seating capacity" },
+          "description": {
+            "type": "string",
+            "description": "Additional details about the bus type"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+          }
+        }
+      },
+      "BusTypeCreate": {
+        "type": "object",
+        "required": ["type", "capacity"],
+        "properties": {
+          "type": { "type": "string" },
+          "capacity": { "type": "integer" },
+          "description": { "type": "string" }
+        }
+      },
+      "BusTypeUpdate": {
+        "type": "object",
+        "properties": {
+          "type": { "type": "string" },
+          "capacity": { "type": "integer" },
+          "description": { "type": "string" }
+        }
+      },
+      "BusTypeResponse": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "string", "example": "success" },
+          "data": { "$ref": "#/components/schemas/BusType" }
+        }
+      },
+      "BusTypeListResponse": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "string", "example": "success" },
+          "data": {
+            "type": "object",
+            "properties": {
+              "busTypes": {
+                "type": "array",
+                "items": { "$ref": "#/components/schemas/BusType" }
+              },
+              "totalCount": { "type": "integer" },
+              "totalPages": { "type": "integer" },
+              "page": { "type": "integer" },
+              "limit": { "type": "integer" }
+            }
+          }
+        }
+      },
+      "Distance": {
+        "type": "object",
+        "required": ["departure_id", "destination_id", "distance_km"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the distance"
+          },
+          "departure_id": {
+            "type": "string",
+            "description": "Departure point ID"
+          },
+          "destination_id": {
+            "type": "string",
+            "description": "Destination ID"
+          },
+          "distance_km": {
+            "type": "integer",
+            "description": "Distance in kilometers"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+          }
+        }
+      },
+      "DistanceCreate": {
+        "type": "object",
+        "required": ["departure_id", "destination_id", "distance_km"],
+        "properties": {
+          "departure_id": { "type": "string" },
+          "destination_id": { "type": "string" },
+          "distance_km": { "type": "integer" }
+        }
+      },
+      "DistanceUpdate": {
+        "type": "object",
+        "properties": { "distance_km": { "type": "integer" } }
+      },
+      "DistanceResponse": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "string", "example": "success" },
+          "data": { "$ref": "#/components/schemas/Distance" }
+        }
+      },
+      "DistanceListResponse": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "string", "example": "success" },
+          "data": {
+            "type": "object",
+            "properties": {
+              "distances": {
+                "type": "array",
+                "items": { "$ref": "#/components/schemas/Distance" }
+              },
+              "totalCount": { "type": "integer" },
+              "totalPages": { "type": "integer" },
+              "page": { "type": "integer" },
+              "limit": { "type": "integer" }
+            }
+          }
+        }
+      },
+      "EstimatedTime": {
+        "type": "object",
+        "required": ["route_id", "duration_hours"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the estimated time"
+          },
+          "route_id": { "type": "string", "description": "Route ID" },
+          "duration_hours": {
+            "type": "number",
+            "description": "Estimated duration in hours"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+          }
+        }
+      },
+      "EstimatedTimeCreate": {
+        "type": "object",
+        "required": ["route_id", "duration_hours"],
+        "properties": {
+          "route_id": { "type": "string" },
+          "duration_hours": { "type": "number" }
+        }
+      },
+      "EstimatedTimeUpdate": {
+        "type": "object",
+        "properties": { "duration_hours": { "type": "number" } }
+      },
+      "EstimatedTimeResponse": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "string", "example": "success" },
+          "data": { "$ref": "#/components/schemas/EstimatedTime" }
+        }
+      },
+      "EstimatedTimeListResponse": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "string", "example": "success" },
+          "data": {
+            "type": "object",
+            "properties": {
+              "estimatedTimes": {
+                "type": "array",
+                "items": { "$ref": "#/components/schemas/EstimatedTime" }
+              },
+              "totalCount": { "type": "integer" },
+              "totalPages": { "type": "integer" },
+              "page": { "type": "integer" },
+              "limit": { "type": "integer" }
+            }
+          }
+        }
+      },
+      "TicketPrice": {
+        "type": "object",
+        "required": ["route_id", "bus_type_id", "price", "currency"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the ticket price"
+          },
+          "route_id": { "type": "string", "description": "Route ID" },
+          "bus_type_id": { "type": "string", "description": "Bus type ID" },
+          "price": { "type": "integer", "description": "Ticket price" },
+          "currency": {
+            "type": "string",
+            "description": "Currency code (e.g., VND)"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+          }
+        }
+      },
+      "TicketPriceCreate": {
+        "type": "object",
+        "required": ["route_id", "bus_type_id", "price", "currency"],
+        "properties": {
+          "route_id": { "type": "string" },
+          "bus_type_id": { "type": "string" },
+          "price": { "type": "integer" },
+          "currency": { "type": "string" }
+        }
+      },
+      "TicketPriceUpdate": {
+        "type": "object",
+        "properties": {
+          "price": { "type": "integer" },
+          "currency": { "type": "string" }
+        }
+      },
+      "TicketPriceResponse": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "string", "example": "success" },
+          "data": { "$ref": "#/components/schemas/TicketPrice" }
+        }
+      },
+      "TicketPriceListResponse": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "string", "example": "success" },
+          "data": {
+            "type": "object",
+            "properties": {
+              "ticketPrices": {
+                "type": "array",
+                "items": { "$ref": "#/components/schemas/TicketPrice" }
+              },
+              "totalCount": { "type": "integer" },
+              "totalPages": { "type": "integer" },
+              "page": { "type": "integer" },
+              "limit": { "type": "integer" }
+            }
+          }
+        }
+      },
+      "Route": {
+        "type": "object",
+        "required": [
+          "departure_id",
+          "destination_id",
+          "bus_type_id",
+          "departure_time",
+          "duration_hours",
+          "price",
+          "currency"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the route"
+          },
+          "departure_id": {
+            "type": "string",
+            "description": "Departure point ID"
+          },
+          "destination_id": {
+            "type": "string",
+            "description": "Destination ID"
+          },
+          "bus_type_id": { "type": "string", "description": "Bus type ID" },
+          "departure_time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Departure time"
+          },
+          "duration_hours": {
+            "type": "number",
+            "description": "Estimated duration in hours"
+          },
+          "price": { "type": "integer", "description": "Ticket price" },
+          "currency": {
+            "type": "string",
+            "description": "Currency code (e.g., VND)"
+          },
+          "available_seats": {
+            "type": "integer",
+            "description": "Number of available seats"
+          }
+        }
+      },
+      "RouteListResponse": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "string", "example": "success" },
+          "data": {
+            "type": "object",
+            "properties": {
+              "routes": {
+                "type": "array",
+                "items": { "$ref": "#/components/schemas/Route" }
+              },
+              "totalCount": { "type": "integer" },
+              "totalPages": { "type": "integer" },
+              "page": { "type": "integer" },
+              "limit": { "type": "integer" }
+            }
+          }
+        }
+      },
+      "Booking": {
+        "type": "object",
+        "required": [
+          "user_id",
+          "route_id",
+          "seat_number",
+          "booking_date",
+          "passenger_name",
+          "passenger_phone"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the booking"
+          },
+          "user_id": { "type": "string", "description": "User ID" },
+          "route_id": { "type": "string", "description": "Route ID" },
+          "seat_number": { "type": "integer", "description": "Seat number" },
+          "booking_date": {
+            "type": "string",
+            "format": "date",
+            "description": "Booking date"
+          },
+          "passenger_name": {
+            "type": "string",
+            "description": "Passenger's full name"
+          },
+          "passenger_phone": {
+            "type": "string",
+            "description": "Passenger's phone number"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+          }
+        }
+      },
+      "BookingCreate": {
+        "type": "object",
+        "required": [
+          "user_id",
+          "route_id",
+          "seat_number",
+          "booking_date",
+          "passenger_name",
+          "passenger_phone"
+        ],
+        "properties": {
+          "user_id": { "type": "string" },
+          "route_id": { "type": "string" },
+          "seat_number": { "type": "integer" },
+          "booking_date": { "type": "string", "format": "date" },
+          "passenger_name": { "type": "string" },
+          "passenger_phone": { "type": "string" }
+        }
+      },
+      "BookingResponse": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "string", "example": "success" },
+          "data": { "$ref": "#/components/schemas/Booking" }
+        }
+      },
+      "BookingListResponse": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "string", "example": "success" },
+          "data": {
+            "type": "object",
+            "properties": {
+              "bookings": {
+                "type": "array",
+                "items": { "$ref": "#/components/schemas/Booking" }
+              },
+              "totalCount": { "type": "integer" },
+              "totalPages": { "type": "integer" },
+              "page": { "type": "integer" },
+              "limit": { "type": "integer" }
+            }
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "required": [
+          "username",
+          "email",
+          "password",
+          "full_name",
+          "phone_number"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the user"
+          },
+          "username": { "type": "string", "description": "Username" },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "User email"
+          },
+          "password": { "type": "string", "description": "Hashed password" },
+          "full_name": { "type": "string", "description": "User's full name" },
+          "phone_number": {
+            "type": "string",
+            "description": "User's phone number"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+          }
+        }
+      },
+      "UserRegister": {
+        "type": "object",
+        "required": [
+          "username",
+          "email",
+          "password",
+          "full_name",
+          "phone_number"
+        ],
+        "properties": {
+          "username": { "type": "string" },
+          "email": { "type": "string", "format": "email" },
+          "password": { "type": "string" },
+          "full_name": { "type": "string" },
+          "phone_number": { "type": "string" }
+        }
+      },
+      "UserResponse": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "string", "example": "success" },
+          "data": {
+            "type": "object",
+            "properties": {
+              "message": { "type": "string" },
+              "user": { "$ref": "#/components/schemas/User" }
+            }
+          }
+        }
+      },
+      "UserLogin": {
+        "type": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "email": { "type": "string", "format": "email" },
+          "password": { "type": "string" }
+        }
+      },
+      "LoginResponse": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "string", "example": "success" },
+          "data": {
+            "type": "object",
+            "properties": {
+              "message": { "type": "string" },
+              "accessToken": { "type": "string" },
+              "user": { "$ref": "#/components/schemas/User" }
+            }
+          }
+        }
+      },
+      "SuccessResponse": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "string", "example": "success" },
+          "data": {
+            "type": "object",
+            "properties": { "message": { "type": "string" } }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
